@@ -16,5 +16,5 @@ app.use('/', indexRoutes);
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-    console.log(`Serverul rulează la adresa http://localhost:${PORT}`);
+    console.log(`Serverul ruleaza la adresa http://localhost:${PORT}`);
 });
