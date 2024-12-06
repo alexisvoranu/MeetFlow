@@ -1,6 +1,7 @@
 import express from 'express';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+// import {router} from './routes/config.js'
 
 dotenv.config();
 
@@ -10,8 +11,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true })); 
 app.use(morgan(process.env.LOG_LEVEL || 'dev')); 
 
-import indexRoutes from './routes/script.js';
-app.use('/', indexRoutes);
+//app.use("/api/v1", router);
 
 const PORT = process.env.PORT || 3000;
 

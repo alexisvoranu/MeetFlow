@@ -1,5 +1,6 @@
 <template>
   <div class="home">
+    <ParticipantNavbar/>
     <p>{{ message }}</p>
     <button @click="changeMessage">Schimbă mesajul</button>
     <HelloWorld msg="Welcome to Your Vue.js App" />
@@ -8,11 +9,15 @@
 
 <script>
 // @ is an alias to /src
+import ParticipantNavbar from "@/components/Participant/ParticipantNavbar.vue";
 import { computed } from "vue";
 import { useStore } from "vuex";
 
 export default {
   name: "HomeView",
+  components: {
+    ParticipantNavbar,
+  },
   setup() {
     const store = useStore();
     const message = computed(() => store.getters.message);

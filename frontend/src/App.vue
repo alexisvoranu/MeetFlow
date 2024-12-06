@@ -1,21 +1,13 @@
 <template>
   <div id="app">
-    <AppNavbar />
-    <AddDocument/>
     <router-view />
   </div>
 </template>
 
 <script>
-import AddDocument from "./components/AddDocument.vue";
-import AppNavbar from "./components/AppNavbar.vue";
-
 export default {
   name: "App",
-  components: {
-    AppNavbar,
-    AddDocument
-  },
+  components: {},
 };
 </script>
 
