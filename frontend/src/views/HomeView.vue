@@ -1,6 +1,7 @@
 <template>
   <div class="home">
-    <ParticipantNavbar/>
+    <HomeNavbar />
+    <AddDocument />
     <p>{{ message }}</p>
     <button @click="changeMessage">Schimbă mesajul</button>
     <HelloWorld msg="Welcome to Your Vue.js App" />
@@ -9,14 +10,16 @@
 
 <script>
 // @ is an alias to /src
-import ParticipantNavbar from "@/components/Participant/ParticipantNavbar.vue";
+import AddDocument from "@/components/AddDocument.vue";
+import HomeNavbar from "@/components/HomeNavbar.vue";
 import { computed } from "vue";
 import { useStore } from "vuex";
 
 export default {
   name: "HomeView",
   components: {
-    ParticipantNavbar,
+    HomeNavbar,
+    AddDocument,
   },
   setup() {
     const store = useStore();
