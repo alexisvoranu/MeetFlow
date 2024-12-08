@@ -36,15 +36,15 @@
             >
           </div>
         </div>
-        <div class="form-title">Please enter your credentials</div>
-        <LoginForm :user-role="role" />
+        <div class="form-title mb-3">Please enter your credentials</div>
+        <LoginForm :userRole="role" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import LoginForm from '@/components/Auth/LoginForm.vue';
+import LoginForm from "@/components/Auth/LoginForm.vue";
 
 export default {
   name: "LoginView",

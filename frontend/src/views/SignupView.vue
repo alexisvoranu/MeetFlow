@@ -4,7 +4,7 @@
     <div class="sign-up-container">
       <div class="sign-up-form">
         <div class="role-selection">
-          <div class="role-selection-title">Please select your role</div>
+          <div class="role-selection-title mt-3">Please select your role</div>
           <div
             class="btn-group"
             role="group"
@@ -38,7 +38,7 @@
           </div>
         </div>
         <div class="form-title">Please enter your details below</div>
-        <SignupForm :user-role="role" />
+        <SignupForm :userRole="role" />
       </div>
     </div>
   </div>

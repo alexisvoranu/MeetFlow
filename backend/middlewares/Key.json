@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "meetflow-e5950",
+  "private_key_id": "8e2cf9ef0de1e355cd498341ec71184084bf935c",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCpFpl5bhdhOsBX\nbJiEfxVJ2fX2tTVPoz6QoZ775mhKH29IrJt4B5VuFDRj4PsowD5Be/wWkdDFfzCz\nqZj3/lGoZ4t7bIB1Qlo8xQQGqT44BQ/h/ITdH4pYMACO90hbCWfaHj/lT4mwEE2k\nyghFYG2EFFZnpDef/AaoaEaCvmijUtF0AkPgBv5ZjRq4lHQT3GQ9iH5iyK5g9vwq\nPtb+NGP9pTOuCUYMqQhg4fz9ZywwiBQE1MEvpgmZMjSArDmOrNYO95ptn8K7Yehd\nL30Hnc92waQLMUv93LaTuj781cUhNWdELglL2BjVXm3SYMyRL+eMAcjd/bXCBEwZ\nQDPxjQCXAgMBAAECggEAG4pNHbnFtcDDpTml2dF3yTCRXvPYJrbNsPGcxdCbDz+c\nI40hlro9fNFuUGT2ONv0XTwcLMeRO9Rh5/wT/d3UClwwcWjpv1o6/QeQhqPi422c\n+aTkixOLt/Nm6TeeTF2gJvxNp0Qo2/QRLBRP++TJ0afHrwJ7S46EExfw1si78vsn\nx3qpfe4WC/F8+bXKnmZ0k7f3I+lkjEXlSA2zuPh95e00bi9daV2obtslN0JnHVKy\n48XfbOlt9/gBuRKBx1gSRJrZ6jUx1W/YhQ+7IA6yK/dxAOmbWbcbulSaWZRyjo5t\np0H5L/m5xS0BJE5E3CytlcFKLXFkn+pGdcUI0cMQSQKBgQDm74+dMQbk35PB3CLS\nKxq9haQJW2H1L6CfM0STIR2BHzVaw9hMZXYMztN93SUmBkDYd5sx/nVOHJAv25kR\nxkWoG9rtcyhtwZq7z16QloFT9yS7aA1d92HaRBFpyq+FJAABKs/JOw/xc5utT+XR\n6iQu8VirFrlziCOmfj6ApQjdSwKBgQC7cKKwdFES6ZfLkN8thjWh5tBMjIhkZc8a\nYb/O+LRUBHyxirBZbkU48Cave0YNXdZx0Dbibvky+8AHKT8OMFT6VqlevsU6GZAY\nPBvbdYlPicZgKrdci9AmDj4Z5vG/l+G74o1yFjpftCm12plkrXv3WUEvRKq0FLLa\n1IV8zpPWZQKBgQDDKo46kGZ9Ip4i5cHf0GHm7Xx2E+6zYa7jHFbF6OSgbRmQPZcc\n6Vpc9KYz5qMwgXRn/J0CIURN4UHR0EqKhP/1VKUuq3XtXANC2bvXgfqGVYWLhCJX\n2WuvJHt65rpzULtYQTAdpnaQ3d0hGTbmsnQl3/3JiYjtJI7MdECqQ888BQKBgD09\nW6oTFrn7H+EegAw7oSI4ay3XbGiA6t1Pun9AuooIvUS0b1GIuY0UyU7kE8siMYIV\n6Rip8Tk7D05Hp5ZXLCxuS//sjDujRnTkjqVxDV+zP+EDk8zk0Sjd1mRYE/vo/5OH\nPXdc082Y61fDCALgu3Pg8W8kHDGh4Z2leceBJsQRAoGBAM6eC/ghrn8HhFxtHzda\nC+2v6i93RSUdNUX/yeS2buZnME6H2z6dhDERh/iM6htbGqyWAaKJkbp7h4u/HNa+\nf133QvTDg8Rjzl407uuLHJvBHucu0Clza5baX7QzKUV4rgjHWMkYWmDsyu5nqb2I\n+VU1AhAIL1MY8jyzXmVZO2jA\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-zj3z9@meetflow-e5950.iam.gserviceaccount.com",
+  "client_id": "108752991780290715116",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-zj3z9%40meetflow-e5950.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

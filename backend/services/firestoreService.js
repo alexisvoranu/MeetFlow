@@ -1,5 +1,5 @@
 import { collection, addDoc } from "firebase/firestore";
-import { db } from "../firebase.js";
+import { db } from "../firebase/firebase.js";
 import { faker } from "@faker-js/faker";
 
 const addDocument = async (collectionName, data) => {

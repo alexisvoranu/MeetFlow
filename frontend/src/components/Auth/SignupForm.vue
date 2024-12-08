@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <form class="signup-form" @submit.prevent="handleSignup">
+  <div class="form-container">
+    <form class="signup-form" @submit.prevent="register">
       <div class="form-floating mb-3">
         <input
           type="text"
@@ -25,7 +25,7 @@
         <label for="email">Email address</label>
       </div>
 
-      <div class="form-floating">
+      <div class="form-floating mb-3">
         <input
           type="password"
           class="form-control"
@@ -41,21 +41,24 @@
         Create account
       </button>
     </form>
-
     <div
-      v-if="alert.show"
-      :class="`alert ${alert.type} d-flex align-items-center`"
-      role="alert"
+      v-if="errMsg"
+      class="alert alert-danger d-flex align-items-center justify-content-center"
     >
-      <div>
-        {{ alert.message }}
-      </div>
+      {{ errMsg }}
     </div>
   </div>
 </template>
 
 <script>
-import { ref, watch } from "vue";
+import { ref } from "vue";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+import { getFirestore, setDoc, doc, serverTimestamp } from "firebase/firestore";
+import { useRouter } from "vue-router";
 
 export default {
   name: "SignupForm",
@@ -66,96 +69,65 @@ export default {
     },
   },
   setup(props) {
-    const name = ref("");
     const email = ref("");
     const password = ref("");
-    const alert = ref({ show: false, type: "", message: "" });
+    const name = ref("");
+    const router = useRouter();
+    const errMsg = ref("");
 
-    const signup = () => {
-      const userDetails = {
-        name: name.value,
-        email: email.value,
-        password: password.value,
-      };
+    const register = async () => {
+      errMsg.value = "";
 
-      let signUpURL = import.meta.env.VITE_SERVER_URL;
-
-      if (props.userRole === "organizer") {
-        signUpURL += "/eventOrganizers/save";
-      } else if (props.userRole === "participant") {
-        signUpURL += "/participants/create";
+      if (!email.value || !password.value || !name.value) {
+        errMsg.value = "Please fill in all fields.";
+        return;
       }
 
-      fetch(signUpURL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userDetails),
-      })
-        .then((res) => {
-          switch (res.status) {
-            case 404:
-              setAlert({
-                show: true,
-                type: "alert-warning",
-                message: "Missing name, email or password!",
-              });
-              break;
-            case 400:
-              setAlert({
-                show: true,
-                type: "alert-danger",
-                message: "Email already in use!",
-              });
-              break;
-            case 201:
-              setAlert({
-                show: true,
-                type: "alert-success",
-                message: "Account created successfully!",
-              });
-              break;
-          }
+      try {
+        const auth = getAuth();
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          email.value,
+          password.value
+        );
 
-          setTimeout(() => {
-            alert.value = { show: false, type: "", message: "" };
-          }, 1000);
-        })
-        .catch(() => {
-          setAlert({
-            show: true,
-            type: "alert-info",
-            message: "An error occurred while creating the account!",
-          });
-
-          setTimeout(() => {
-            alert.value = { show: false, type: "", message: "" };
-          }, 1000);
+        updateProfile(userCredential.user, {
+          displayName: name.value,
         });
-    };
 
-    const setAlert = (newAlert) => {
-      alert.value = newAlert;
-    };
+        const userId = userCredential.user.uid;
 
-    const handleSignup = () => {
-      signup();
+        const db = getFirestore();
+        const collection =
+          props.userRole === "organizer" ? "organizers" : "users";
+
+        await setDoc(doc(db, collection, userId), {
+          name: name.value,
+          email: email.value,
+          createdAt: serverTimestamp(),
+        });
+
+        console.log("User successfully registered and saved in Firestore!");
+        router.push("/");
+      } catch (error) {
+        console.error("Error during registration:", error);
+        errMsg.value = error.message; 
+      }
     };
 
     return {
-      name,
       email,
       password,
-      alert,
-      handleSignup,
+      name,
+      register,
+      errMsg,
     };
   },
 };
 </script>
 
 <style scoped>
-.signup-form {
+.form-container {
   padding: 20px;
 }
 
@@ -168,8 +140,11 @@ export default {
 }
 
 .alert {
-  height: 7%;
-  justify-content: center;
+  height: fit-content;
+  display: flex;
   align-items: center;
+  justify-content: center;
+  padding: 10px;
+  margin-top: 10px;
 }
 </style>

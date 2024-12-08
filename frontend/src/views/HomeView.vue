@@ -2,9 +2,6 @@
   <div class="home">
     <HomeNavbar />
     <AddDocument />
-    <p>{{ message }}</p>
-    <button @click="changeMessage">Schimbă mesajul</button>
-    <HelloWorld msg="Welcome to Your Vue.js App" />
   </div>
 </template>
 
@@ -12,8 +9,6 @@
 // @ is an alias to /src
 import AddDocument from "@/components/AddDocument.vue";
 import HomeNavbar from "@/components/HomeNavbar.vue";
-import { computed } from "vue";
-import { useStore } from "vuex";
 
 export default {
   name: "HomeView",
@@ -21,14 +16,7 @@ export default {
     HomeNavbar,
     AddDocument,
   },
-  setup() {
-    const store = useStore();
-    const message = computed(() => store.getters.message);
-    const changeMessage = () => {
-      store.dispatch("updateMessage", "Mesaj actualizat din Home");
-    };
-    return { message, changeMessage };
-  },
+  setup() {},
 };
 </script>
 

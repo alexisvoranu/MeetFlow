@@ -24,9 +24,9 @@
             <button
               class="nav-link active"
               aria-current="page"
-              @click="navigate('/participant/events/all')"
+              @click="navigate('/eventGroups/all')"
             >
-              Attend Event
+              Manage Events
             </button>
           </li>
         </ul>
@@ -34,7 +34,7 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item" v-if="isLoggedIn">
-            <button class="nav-link active mx-3" aria-current="page">
+            <button class="nav-link active mx-3">
               Bună, {{ numeUtilizator }}
             </button>
           </li>
@@ -63,7 +63,7 @@ export default {
   setup() {
     const router = useRouter();
     const isLoggedIn = ref(false);
-    const numeUtilizator = ref(null);
+    const numeUtilizator = ref("");
     const auth = getAuth();
 
     onMounted(() => {
@@ -73,7 +73,7 @@ export default {
           numeUtilizator.value = user.displayName || "Utilizator";
         } else {
           isLoggedIn.value = false;
-          numeUtilizator.value = null;
+          numeUtilizator.value = "";
         }
       });
     });

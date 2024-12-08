@@ -1,47 +1,36 @@
 <template>
-  <div>
-    <form class="login-form-fields" @submit.prevent="handleLogin">
-      <div class="form-floating mb-3">
-        <input
-          type="email"
-          class="form-control"
-          id="email"
-          placeholder="name@example.com"
-          required
-          v-model="email"
-        />
-        <label for="email">Email address</label>
-      </div>
-      <div class="form-floating mb-3">
-        <input
-          type="password"
-          class="form-control"
-          id="password"
-          placeholder="Password"
-          required
-          v-model="password"
-        />
-        <label for="password">Password</label>
-      </div>
-      <button type="submit" class="btn btn-primary mb-3 btn-login">
-        Login
-      </button>
-    </form>
-
-    <div
-      v-if="alert.show"
-      :class="`alert ${alert.type} d-flex align-items-center`"
-      role="alert"
-    >
-      <div>{{ alert.message }}</div>
+  <form class="login-form-fields" @submit.prevent="handleLogin">
+    <div class="form-floating mb-3">
+      <input
+        type="email"
+        class="form-control"
+        id="email"
+        placeholder="name@example.com"
+        required
+        v-model="email"
+      />
+      <label for="email">Email address</label>
     </div>
-  </div>
+    <div class="form-floating mb-3">
+      <input
+        type="password"
+        class="form-control"
+        id="password"
+        placeholder="Password"
+        required
+        v-model="password"
+      />
+      <label for="password">Password</label>
+    </div>
+    <button type="submit" class="btn btn-primary mb-3 btn-login">Login</button>
+    <div v-if="errMsg" class="alert alert-danger">{{ errMsg }}</div>
+  </form>
 </template>
 
 <script>
 import { ref } from "vue";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "vue-router";
-import { SERVER_URL } from "@/constants";
 
 export default {
   name: "LoginForm",
@@ -52,76 +41,65 @@ export default {
     },
   },
   setup(props) {
-    const router = useRouter();
     const email = ref("");
     const password = ref("");
-    const alert = ref({ show: false, type: "", message: "" });
+    const router = useRouter();
+    const errMsg = ref("");
 
-    const handleLogin = () => {
-      const userDetails = {
-        email: email.value,
-        password: password.value,
-      };
-
-      let loginURL = SERVER_URL;
-
-      if (props.userRole === "organizer") {
-        loginURL += "/eventOrganizers/login";
-      } else if (props.userRole === "participant") {
-        loginURL += "/participants/login";
+    const handleLogin = async () => {
+      if (!email.value || !password.value) {
+        errMsg.value = "Please fill in all fields.";
+        return;
       }
 
-      fetch(loginURL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userDetails),
-      })
-        .then(async (res) => {
-          const data = await res.json();
-          if (res.ok) {
-            localStorage.setItem("userDetails", JSON.stringify(data));
-            if (props.userRole === "organizer") {
-              router.push("/organizerHome");
-            } else if (props.userRole === "participant") {
-              router.push("/participantHome");
-            }
-          } else {
-            throw new Error(
-              data.message ||
-                "An error occurred while trying to authenticate you!"
-            );
-          }
-        })
-        .catch((error) => {
-          alert.value = {
-            show: true,
-            type: "alert-danger",
-            message: error.message,
-          };
-          setTimeout(() => {
-            alert.value = { show: false, type: "", message: "" };
-          }, 1000);
-        });
+      try {
+        const auth = getAuth();
+        const userCredential = await signInWithEmailAndPassword(
+          auth,
+          email.value,
+          password.value
+        );
+
+        const token = await userCredential.user.getIdToken();
+        localStorage.setItem("firebaseToken", token);
+
+        const user = userCredential.user;
+        const userName = user.displayName;
+        const userEmail = user.email;
+
+        localStorage.setItem("clientName", userName);
+        localStorage.setItem("clientEmail", userEmail);
+        localStorage.setItem("firebaseToken", token);
+
+        const redirectPath =
+          props.userRole === "organizer"
+            ? "/organizerHome"
+            : "/participantHome";
+        router.push(redirectPath);
+      } catch (error) {
+        switch (error.code) {
+          case "auth/invalid-email":
+            errMsg.value = "This email is invalid!";
+            break;
+          case "auth/user-not-found":
+            errMsg.value = "No account with this email was found!";
+            break;
+          case "auth/wrong-password":
+            errMsg.value = "The password is incorrect!";
+            break;
+          default:
+            errMsg.value = "Email or password is incorrect!";
+            break;
+        }
+      }
     };
 
     return {
       email,
       password,
-      alert,
       handleLogin,
+      errMsg,
     };
   },
 };
 </script>
-
-<style scoped>
-.login-form-fields {
-  padding: 20px;
-}
-
-.btn-login {
-  margin-top: 20px;
-}
-</style>
