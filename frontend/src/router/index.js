@@ -4,6 +4,7 @@ import LoginView from "@/views/LoginView.vue";
 import SignupView from "@/views/SignupView.vue";
 import ParticipantHome from "@/views/Participant/ParticipantHome.vue";
 import OrganizerHome from "@/views/Organizer/OrganizerHome.vue";
+import OrganizerEventGroups from "@/views/Organizer/OrganizerEventGroups.vue";
 
 const routes = [
   {
@@ -26,6 +27,11 @@ const routes = [
   {
     path: "/organizerHome",
     component: OrganizerHome,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/eventGroups/all",
+    component: OrganizerEventGroups,
     meta: { requiresAuth: true },
   },
 ];

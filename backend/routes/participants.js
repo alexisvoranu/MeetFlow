@@ -1,11 +1,11 @@
-// import express from 'express';
-// import * as participantsController from '../controllers/participants.js';
+import express from 'express';
+import * as participantsController from '../controllers/participants.js';
 
-// export const router = express.Router();
+export const router = express.Router();
 
 // router.get('/getById', participantsController.getParticipantById);
 
-// router.get('/getByEvent', participantsController.getParticipantsByEvent);
+router.get('/getParticipantsByEvent', participantsController.getParticipantsByEvent);
 
 // router.get('/getByEventGroup', participantsController.getParticipantsByEventGroup);
 

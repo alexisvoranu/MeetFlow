@@ -99,7 +99,7 @@ export default {
 
         const db = getFirestore();
         const collection =
-          props.userRole === "organizer" ? "organizers" : "users";
+          props.userRole === "organizer" ? "organizers" : "participants";
 
         await setDoc(doc(db, collection, userId), {
           name: name.value,

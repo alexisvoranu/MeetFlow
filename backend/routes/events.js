@@ -1,13 +1,13 @@
-// import express from 'express';
-// import * as eventsController from "../controllers/events.js"
+import express from 'express';
+import * as eventsController from "../controllers/events.js"
 
-// export const router = express.Router();
+export const router = express.Router();
 
 // router.get('/getEventById', eventsController.getEventById);
 
 // router.get('/getEventsByOrganizer', eventsController.getAllEventsForOrganizer);
 
-// router.get('/getEventsByEventsGroup', eventsController.getAllEventsForGroup);
+router.get('/getEventsByEventsGroup', eventsController.getAllEventsForGroup);
 
 // router.get('/getEventsByStatus', eventsController.getEventsByStatus);
 

@@ -1,17 +1,19 @@
 <template>
   <div className="main">
     <OrganizerNavbar />
-    <div className="header-greatings">Welcome, Alex</div>
+    <AddDocument />
   </div>
 </template>
 
 <script>
+import AddDocument from "@/components/AddDocument.vue";
 import OrganizerNavbar from "@/components/Organizer/OrganizerNavbar.vue";
 
 export default {
   name: "EventOrganizerHome",
   components: {
     OrganizerNavbar,
+    AddDocument
   },
   setup() {},
 };

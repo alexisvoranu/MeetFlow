@@ -67,9 +67,12 @@ export default {
         const userName = user.displayName;
         const userEmail = user.email;
 
-        localStorage.setItem("clientName", userName);
-        localStorage.setItem("clientEmail", userEmail);
-        localStorage.setItem("firebaseToken", token);
+        const userDetails = {
+          email: userEmail,
+          name: userName,
+        };
+
+        localStorage.setItem("userDetails", JSON.stringify(userDetails));
 
         const redirectPath =
           props.userRole === "organizer"

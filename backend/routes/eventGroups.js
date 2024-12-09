@@ -1,9 +1,9 @@
-// import express from 'express';
-// import * as eventGroupController from "../controllers/eventGroups.js"
+import express from "express";
+import * as eventGroupController from "../controllers/eventGroups.js";
 
-// export const router = express.Router();
+export const router = express.Router();
 
-// router.get('/getAllForOrganizer', eventGroupController.getAllForOrganizer)
+router.get("/getAllEventGroupsForOrganizer", eventGroupController.getAllForOrganizer);
 
 // router.post('/create', eventGroupController.create)
 

@@ -1,9 +1,9 @@
-// import express from 'express';
-// import * as eventOrganizerController from "../controllers/eventOgranizers.js"
+import express from "express";
+import * as eventOrganizerController from "../controllers/eventOrganizers.js";
 
 // export const router = express.Router();
 
-// router.get('/getAll', eventOrganizerController.getAllEventOrganizers)
+// router.get("/getEventOrganizers", eventOrganizerController.getEventOrganizers);
 
 // router.post('/create', eventOrganizerController.create)
 

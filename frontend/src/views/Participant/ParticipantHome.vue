@@ -1,7 +1,6 @@
 <template>
   <div className="main">
     <ParticipantNavbar />
-    <div className="header-greatings">Welcome, Alex</div>
   </div>
 </template>
 
