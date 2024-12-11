@@ -84,8 +84,7 @@ export default {
 
     const handleSignOut = () => {
       localStorage.removeItem("firebaseToken");
-      localStorage.removeItem("clientEmail");
-      localStorage.removeItem("clientName");
+      localStorage.removeItem("userDetails");
       signOut(auth)
         .then(() => {
           router.push("/");

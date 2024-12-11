@@ -17,12 +17,8 @@ app.use(cors({ origin: "*" }));
 app.use(authenticateToken);
 app.use("/api/v1", router);
 
-// app.get("/participantHome", authenticateToken, (req, res) => {
-//   res.json({ message: "This is a protected route", user: req.user });
-// });
-
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
-  console.log(`Serverul ruleaza la adresa http://localhost:${PORT}`);
+  console.log(`The server is running at: http://localhost:${PORT}`);
 });

@@ -1,26 +1,44 @@
-import express from 'express';
-import * as eventsController from "../controllers/events.js"
+import express from "express";
+import * as eventsController from "../controllers/events.js";
+import {
+  validateEvent,
+  validateEventPatch,
+} from "../middlewares/validateEvent.js";
 
 export const router = express.Router();
 
-// router.get('/getEventById', eventsController.getEventById);
+router.get(
+  "/getAllEvents",
+  eventsController.getAllEvents
+);
 
-// router.get('/getEventsByOrganizer', eventsController.getAllEventsForOrganizer);
+router.get(
+  "/getAllEventsForOrganizer",
+  eventsController.getAllEventsForOrganizer
+);
 
-router.get('/getEventsByEventsGroup', eventsController.getAllEventsForGroup);
+router.get("/getEventsByEventsGroup", eventsController.getAllEventsForGroup);
 
-// router.get('/getEventsByStatus', eventsController.getEventsByStatus);
+router.get("/getEventsByStatus", eventsController.getEventsByStatus);
 
-// router.get('/getEventToken', eventsController.getAccessTokenForEvent);
+router.get(
+  "/getEventsForParticipant",
+  eventsController.getEventsForParticipant
+);
 
-// router.get('/getEventsForParticipant', eventsController.getAllEventsForParticipant);
+router.post(
+  "/addEventToEventGroup",
+  validateEvent,
+  eventsController.addEventToEventGroup
+);
 
-// router.post('/create', eventsController.create);
+router.patch(
+  "/updateEventInEventGroup",
+  validateEventPatch,
+  eventsController.updateEventInEventGroup
+);
 
-// router.put('/update', eventsController.update);
-
-// router.patch('/setEventStatus', eventsController.changeEventStatus);
-
-// router.post('/registerParticipantToEvent', eventsController.registerParticipantToEvent);
-
-// router.delete('/remove/:id', eventsController.remove);
+router.delete(
+  "/deleteEventFromEventGroup",
+  eventsController.deleteEventFromEventGroup
+);

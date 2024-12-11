@@ -1,12 +1,30 @@
 import express from "express";
 import * as eventGroupController from "../controllers/eventGroups.js";
+import {
+  validateEventGroup,
+  validateEventGroupPatch,
+} from "../middlewares/validateEventGroup.js";
 
 export const router = express.Router();
 
-router.get("/getAllEventGroupsForOrganizer", eventGroupController.getAllForOrganizer);
+router.get(
+  "/getAllEventGroupsForOrganizer",
+  eventGroupController.getAllForOrganizer
+);
 
-// router.post('/create', eventGroupController.create)
+router.post(
+  "/addEventGroupToOrganizer",
+  validateEventGroup,
+  eventGroupController.addEventGroupForOrganizer
+);
 
-// router.put('/update', eventGroupController.update)
+router.patch(
+  "/updateEventGroupForOrganizer",
+  validateEventGroupPatch,
+  eventGroupController.updateEventGroupForOrganizer
+);
 
-// router.delete('/delete/:id', eventGroupController.remove)
+router.delete(
+  "/deleteEventGroupForOrganizer",
+  eventGroupController.deleteEventGroupForOrganizer
+);

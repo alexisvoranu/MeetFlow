@@ -29,10 +29,8 @@ async function generateEventOrganizers(count = 3) {
         const participants = Array(faker.number.int({ min: 5, max: 10 }))
           .fill()
           .map(() => ({
-            id: faker.string.uuid(),
             name: faker.person.fullName(),
             email: faker.internet.email(),
-            password: faker.internet.password(),
           }));
 
         events.push({
@@ -61,10 +59,8 @@ async function generateEventOrganizers(count = 3) {
     }
 
     eventOrganizers.push({
-      id: faker.string.uuid(),
       name: faker.person.fullName(),
       email: faker.internet.email(),
-      password: faker.internet.password(),
       eventGroups,
     });
   }
@@ -76,7 +72,7 @@ export const addEventOrganizersToFirebase = async () => {
   const organizers = await generateEventOrganizers();
 
   for (const organizer of organizers) {
-    const organizerId = await addDocument("eventOrganizers", organizer);
+    const organizerId = await addDocument("organizers", organizer);
 
     if (organizerId) {
       console.log(`Organizator adăugat cu ID-ul: ${organizerId}`);

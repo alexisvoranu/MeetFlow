@@ -118,8 +118,7 @@ export default {
     const getEventGroupsForOrganizer = async () => {
       if (userDetails.value) {
         fetch(
-          //   `${SERVER_URL}/eventGroups/getAllEventGroupsForOrganizer?email=${userDetails.value.email}`,
-          `${SERVER_URL}/eventGroups/getAllEventGroupsForOrganizer?email=Greta_Zboncak29@hotmail.com`,
+            `${SERVER_URL}/eventGroups/getAllEventGroupsForOrganizer?email=${userDetails.value.email}`,
           {
             method: "GET",
             headers: {
