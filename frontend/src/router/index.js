@@ -5,6 +5,7 @@ import SignupView from "@/views/SignupView.vue";
 import ParticipantHome from "@/views/Participant/ParticipantHome.vue";
 import OrganizerHome from "@/views/Organizer/OrganizerHome.vue";
 import OrganizerEventGroups from "@/views/Organizer/OrganizerEventGroups.vue";
+import OrganizerEvents from "@/views/Organizer/OrganizerEvents.vue";
 
 const routes = [
   {
@@ -30,9 +31,15 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
-    path: "/eventGroups/all",
+    path: "/organizer/eventGroups",
     component: OrganizerEventGroups,
     meta: { requiresAuth: true },
+  },
+  {
+    path: "/organizer/events", // Ruta pentru pagina de evenimente
+    name: "allEventsForOrganizer", // Numele rutei
+    component: OrganizerEvents, // Componenta care se va încărca
+    props: (route) => ({ groupId: route.query.groupId }), // Asigură-te că ID-ul grupului este trecut ca prop
   },
 ];
 

@@ -24,7 +24,7 @@
             <button
               class="nav-link active"
               aria-current="page"
-              @click="navigate('/eventGroups/all')"
+              @click="navigate('/organizer/eventGroups')"
             >
               Manage Events
             </button>

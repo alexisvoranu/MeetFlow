@@ -1,8 +1,7 @@
 <template>
   <div class="card">
-    <div class="card-header">Event Group</div>
+    <div class="card-header">{{ groupName }}</div>
     <div class="card-body">
-      <h5 class="card-title">{{ name }}</h5>
       <p class="card-text">{{ description }}</p>
       <div class="card-actions">
         <button type="button" class="btn btn-danger" @click="deleteEventGroup">
@@ -24,6 +23,7 @@
 </template>
 
 <script>
+import { SERVER_URL } from "@/constants";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import * as XLSX from "xlsx";
@@ -34,7 +34,7 @@ export default {
       type: Number,
       required: true,
     },
-    name: {
+    groupName: {
       type: String,
       required: true,
     },
@@ -45,6 +45,14 @@ export default {
   },
   setup(props) {
     const router = useRouter();
+    const userDetails = ref(null);
+
+    const getUserDetailsFromLocalStorage = () => {
+      const storedUserDetails = localStorage.getItem("userDetails");
+      if (storedUserDetails) {
+        userDetails.value = JSON.parse(storedUserDetails);
+      }
+    };
 
     const formatDate = (dateString) => {
       const options = {
@@ -60,8 +68,14 @@ export default {
     const deleteEventGroup = async () => {
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_SERVER_URL}/eventGroups/delete/${props.id}`,
-          { method: "DELETE" }
+          `${SERVER_URL}/eventGroups/deleteEventGroupForOrganizer?eventGroupId=${props.id}&email=${userDetails.value.email}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("firebaseToken")}`,
+              "Content-Type": "application/json",
+            },
+          }
         );
         if (!res.ok) {
           throw new Error(`Error: ${res.status}`);
@@ -75,12 +89,12 @@ export default {
     };
 
     const handleSeeEventsClick = () => {
-      const groupDetails = {
-        id: props.id,
-        name: props.name,
-        description: props.description,
-      };
-      router.push({ name: "event-all", state: { groupDetails } });
+      router.push({
+        name: "allEventsForOrganizer",
+        query: {
+          groupId: props.id,
+        },
+      });
     };
 
     const downloadXlsForEventGroup = async () => {
@@ -109,13 +123,13 @@ export default {
             }));
 
             const worksheet = XLSX.utils.json_to_sheet(confirmationDetails);
-            XLSX.utils.book_append_sheet(workbook, worksheet, event.name);
+            XLSX.utils.book_append_sheet(workbook, worksheet, event.groupName);
           }
         }
 
         XLSX.writeFile(
           workbook,
-          `Participants - Event_Group_${props.name}.xlsx`
+          `Participants - Event_Group_${props.groupName}.xlsx`
         );
       } catch (error) {
         console.error(
@@ -125,8 +139,11 @@ export default {
       }
     };
 
+    getUserDetailsFromLocalStorage();
+
     return {
       deleteEventGroup,
+      userDetails,
       handleSeeEventsClick,
       downloadXlsForEventGroup,
     };

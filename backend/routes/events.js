@@ -7,10 +7,7 @@ import {
 
 export const router = express.Router();
 
-router.get(
-  "/getAllEvents",
-  eventsController.getAllEvents
-);
+router.get("/getAllEvents", eventsController.getAllEvents);
 
 router.get(
   "/getAllEventsForOrganizer",

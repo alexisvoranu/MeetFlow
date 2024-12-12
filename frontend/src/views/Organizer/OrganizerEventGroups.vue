@@ -17,7 +17,7 @@
           v-bind="eventGroup"
         />
       </div>
-      <p v-else class="no-events-message mt-3">
+      <p v-else style="color: white" class="no-events-message mt-3">
         You have not created any event groups.
       </p>
     </div>
@@ -95,6 +95,8 @@ import EventGroupCard from "@/components/Organizer/EventGroupCard.vue";
 import OrganizerNavbar from "@/components/Organizer/OrganizerNavbar.vue";
 import { SERVER_URL } from "@/constants";
 import { ref, onMounted, watch } from "vue";
+import * as bootstrap from "bootstrap";
+window.Modal = bootstrap.Modal;
 
 export default {
   name: "OrganizerEventGroups",
@@ -118,7 +120,7 @@ export default {
     const getEventGroupsForOrganizer = async () => {
       if (userDetails.value) {
         fetch(
-            `${SERVER_URL}/eventGroups/getAllEventGroupsForOrganizer?email=${userDetails.value.email}`,
+          `${SERVER_URL}/eventGroups/getAllEventGroupsForOrganizer?email=${userDetails.value.email}`,
           {
             method: "GET",
             headers: {
@@ -142,31 +144,58 @@ export default {
       }
     };
 
-    const handleSaveEventGroup = () => {
+    const handleSaveEventGroup = async () => {
+      if (!eventGroupName.value || !eventGroupDescription.value) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
       const groupDetails = {
-        name: eventGroupName.value,
-        description: eventGroupDescription.value,
-        organizerId: userDetails.value.id,
+        email: userDetails.value.email,
+        eventGroup: {
+          groupName: eventGroupName.value,
+          description: eventGroupDescription.value,
+        },
       };
 
-      fetch(`${SERVER_URL}/eventGroups/save`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(groupDetails),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          console.log(data);
-          window.location.reload();
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-          window.location.reload();
-        });
-    };
+      try {
+        const response = await fetch(
+          `${SERVER_URL}/eventGroups/addEventGroupToOrganizer`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("firebaseToken")}`,
+            },
+            body: JSON.stringify(groupDetails),
+          }
+        );
 
+        if (response.status === 200) {
+          const modal = bootstrap.Modal.getInstance(
+            document.getElementById("exampleModal")
+          );
+          modal.hide();
+          window.location.reload();
+        } else {
+          const data = await response.json();
+          if (data.errors) {
+            data.errors.forEach((error) => {
+              alert(error.msg);
+            });
+          } else {
+            throw new Error(
+              `Failed to save event group. Status: ${response.status}`
+            );
+          }
+        }
+      } catch (error) {
+        console.error("Error saving event group:", error);
+        alert(
+          "An error occurred while saving the event group. Please try again later."
+        );
+      }
+    };
     onMounted(() => {
       getUserDetailsFromLocalStorage();
     });
