@@ -34,11 +34,6 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item" v-if="isLoggedIn">
-            <button class="nav-link active mx-3" aria-current="page">
-              Bună, {{ numeUtilizator }}
-            </button>
-          </li>
-          <li class="nav-item" v-if="isLoggedIn">
             <button
               class="btn btn-warning"
               aria-current="page"

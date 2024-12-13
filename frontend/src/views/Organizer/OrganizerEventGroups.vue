@@ -10,7 +10,7 @@
       Add event group
     </button>
     <div class="event-groups-cards">
-      <div v-if="eventGroupsList.length > 0">
+      <div id="card" v-if="eventGroupsList.length > 0">
         <EventGroupCard
           v-for="eventGroup in eventGroupsList"
           :key="eventGroup.id"
@@ -280,5 +280,9 @@ export default {
   margin-top: 2rem;
   margin-right: 2rem;
   align-self: flex-end;
+}
+
+#card {
+  width: 30%;
 }
 </style>

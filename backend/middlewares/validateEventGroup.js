@@ -3,11 +3,11 @@ import { body, validationResult } from "express-validator";
 export const validateEventGroup = [
   body("eventGroup.groupName")
     .isLength({ min: 3 })
-    .withMessage("Numele grupului trebuie să aibă cel puțin 3 caractere"),
+    .withMessage("The group name must be at least 3 characters long"),
 
   body("eventGroup.description")
     .notEmpty()
-    .withMessage("Descrierea grupului nu poate fi goală"),
+    .withMessage("The group description cannot be empty"),
 
   (req, res, next) => {
     const errors = validationResult(req);
@@ -22,12 +22,12 @@ export const validateEventGroupPatch = [
   body("groupName")
     .optional()
     .isLength({ min: 3 })
-    .withMessage("Numele grupului trebuie să aibă cel puțin 3 caractere"),
+    .withMessage("The group name must be at least 3 characters long"),
 
   body("description")
     .optional()
     .notEmpty()
-    .withMessage("Descrierea grupului nu poate fi goală"),
+    .withMessage("The group description cannot be empty"),
 
   (req, res, next) => {
     const errors = validationResult(req);

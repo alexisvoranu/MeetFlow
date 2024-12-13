@@ -2,7 +2,7 @@
   <div>
     <!-- Event Card -->
     <div
-      class="list-group-item list-group-item-action"
+      class="list-group-item list-group-item-action my-3"
       style="border-radius: 1rem"
     >
       <div class="d-flex w-100 justify-content-center">
@@ -11,7 +11,7 @@
       <span
         :class="[
           'badge',
-          eventDetails?.status === 'OPEN' ? 'bg-success' : 'bg-danger',
+          eventDetails?.status === 'Open' ? 'bg-success' : 'bg-danger',
         ]"
       >
         {{ eventDetails?.status }}
@@ -83,12 +83,6 @@
                   <p class="mb-2">
                     Email: <strong>{{ participant.email }}</strong>
                   </p>
-                  <!-- <small>
-                    Confirmation date:
-                    <strong>{{
-                      formatDate(participant.registrationTime)
-                    }}</strong>
-                  </small> -->
                 </div>
               </div>
               <div v-else>
@@ -114,7 +108,7 @@
                 !confirmedParticipantsList || !confirmedParticipantsList.length
               "
             >
-              Download XLS File
+              Download XLSX File
             </button>
           </div>
         </div>
@@ -125,7 +119,8 @@
 
 <script>
 import { SERVER_URL } from "@/constants";
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
+import * as XLSX from "xlsx";
 
 export default {
   name: "EventCard",
@@ -135,6 +130,14 @@ export default {
   setup(props) {
     const modalContent = ref("token");
     const confirmedParticipantsList = ref([]);
+    const userDetails = ref(null);
+
+    const getUserDetailsFromLocalStorage = () => {
+      const storedUserDetails = localStorage.getItem("userDetails");
+      if (storedUserDetails) {
+        userDetails.value = JSON.parse(storedUserDetails);
+      }
+    };
 
     const formatDate = (dateString) => {
       const options = {
@@ -178,9 +181,16 @@ export default {
     };
 
     const deleteEvent = () => {
-      fetch(`${SERVER_URL}/events/remove/${props.eventDetails.id}`, {
-        method: "DELETE",
-      })
+      fetch(
+        `${SERVER_URL}/events/deleteEventFromEventGroup?eventId=${props.eventDetails.id}&email=${userDetails.value.email}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("firebaseToken")}`,
+            "Content-Type": "application/json",
+          },
+        }
+      )
         .then((res) => res.json())
         .then(() => {
           window.location.reload();
@@ -189,25 +199,41 @@ export default {
     };
 
     const downloadConfirmedParticipantsInXLSX = () => {
-      const workbook = XLSX.utils.book_new();
+      if (
+        !confirmedParticipantsList.value ||
+        !confirmedParticipantsList.value.length
+      ) {
+        alert("There are no confirmed participants.");
+        return;
+      }
 
-      const formattedParticipants = confirmedParticipantsList.value.map(
-        (p) => ({
-          Name: p.participant.name,
-          Email: p.participant.email,
-          RegistrationTime: formatDate(p.registrationTime),
-        })
-      );
+      try {
+        const workbook = XLSX.utils.book_new();
 
-      const worksheet = XLSX.utils.json_to_sheet(formattedParticipants);
-      XLSX.utils.book_append_sheet(
-        workbook,
-        worksheet,
-        props.eventDetails.name
-      );
+        const formattedParticipants = confirmedParticipantsList.value.map(
+          (p) => ({
+            Name: p.name,
+            Email: p.email,
+          })
+        );
 
-      XLSX.writeFile(workbook, `Participants-${props.eventDetails.name}.xlsx`);
+        const worksheet = XLSX.utils.json_to_sheet(formattedParticipants);
+        XLSX.utils.book_append_sheet(
+          workbook,
+          worksheet,
+          props.eventDetails.name || "Participants"
+        );
+
+        XLSX.writeFile(
+          workbook,
+          `Participants-${props.eventDetails.name || "Event"}.xlsx`
+        );
+      } catch (error) {
+        console.error("Error for downloading XLSX file:", error);
+      }
     };
+
+    getUserDetailsFromLocalStorage();
 
     return {
       modalContent,

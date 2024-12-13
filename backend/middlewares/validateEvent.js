@@ -3,13 +3,13 @@ import { body, validationResult } from "express-validator";
 export const validateEvent = [
   body("event.name")
     .isLength({ min: 3 })
-    .withMessage("Numele evenimentului trebuie să aibă cel puțin 3 caractere"),
+    .withMessage("The event name must have at least 3 characters"),
 
   body("event.startDate").custom((value) => {
     const currentDate = new Date();
     const startDate = new Date(value);
     if (startDate < currentDate) {
-      throw new Error("StartDate trebuie să fie cel puțin în prezent");
+      throw new Error("StartDate must be in the present or future");
     }
     return true;
   }),
@@ -18,7 +18,7 @@ export const validateEvent = [
     const startDate = new Date(req.body.event.startDate);
     const endDate = new Date(value);
     if (endDate <= startDate) {
-      throw new Error("EndDate trebuie să fie după StartDate");
+      throw new Error("EndDate must be after StartDate");
     }
     return true;
   }),
@@ -36,7 +36,7 @@ export const validateEventPatch = [
   body("name")
     .optional()
     .isLength({ min: 3 })
-    .withMessage("Numele evenimentului trebuie să aibă cel puțin 3 caractere"),
+    .withMessage("The event name must have at least 3 characters"),
 
   body("startDate")
     .optional()
@@ -45,7 +45,7 @@ export const validateEventPatch = [
         const currentDate = new Date();
         const startDate = new Date(value);
         if (startDate < currentDate) {
-          throw new Error("StartDate trebuie să fie cel puțin în prezent");
+          throw new Error("StartDate must be in the future");
         }
       }
       return true;
@@ -58,7 +58,7 @@ export const validateEventPatch = [
         const startDate = new Date(req.body.startDate);
         const endDate = new Date(value);
         if (endDate <= startDate) {
-          throw new Error("EndDate trebuie să fie după StartDate");
+          throw new Error("EndDate must be after StartDate");
         }
       }
       return true;

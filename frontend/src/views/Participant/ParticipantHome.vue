@@ -1,18 +1,41 @@
 <template>
   <div className="main">
     <ParticipantNavbar />
+    <div class="header-greatings">Welcome,</div>
+
+    <div v-if="userName" class="hello-text">{{ userName }}</div>
   </div>
 </template>
 
 <script>
 import ParticipantNavbar from "@/components/Participant/ParticipantNavbar.vue";
+import { ref, computed } from "vue";
 
 export default {
   name: "ParticipantHome",
   components: {
     ParticipantNavbar,
   },
-  setup() {},
+  setup() {
+    const userDetails = ref(null);
+
+    const getUserDetailsFromLocalStorage = () => {
+      const storedUserDetails = localStorage.getItem("userDetails");
+      if (storedUserDetails) {
+        userDetails.value = JSON.parse(storedUserDetails);
+      }
+    };
+
+    getUserDetailsFromLocalStorage();
+
+    const userName = computed(() => {
+      return userDetails.value && userDetails.value.name
+        ? userDetails.value.name
+        : "";
+    });
+
+    return { userDetails, userName };
+  },
 };
 </script>
 
@@ -28,6 +51,13 @@ export default {
     #006684,
     #0c829a
   );
+}
+
+.header-greatings {
+  font-size: 3rem;
+  margin-top: 3em;
+  color: #fff;
+  overflow: hidden;
 }
 
 .hello-text {
@@ -50,6 +80,7 @@ export default {
   }
 }
 
+/* The typewriter cursor effect */
 @keyframes blink-caret {
   from,
   to {

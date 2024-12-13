@@ -1,6 +1,6 @@
 <template>
   <div>
-    <button style="margin-top: 5rem" @click="addData">Adaugă date</button>
+    <button class="btn btn-success" style="margin-top: 5rem" @click="addData">Adaugă date</button>
   </div>
 </template>
 

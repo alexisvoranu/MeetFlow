@@ -117,6 +117,8 @@ import OrganizerNavbar from "@/components/Organizer/OrganizerNavbar.vue";
 import { SERVER_URL } from "@/constants";
 import { ref, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
+import * as bootstrap from "bootstrap";
+window.Modal = bootstrap.Modal;
 
 export default {
   name: "OrganizerEvents",
@@ -179,7 +181,6 @@ export default {
                 ? event.endDate.toISOString()
                 : formatFirestoreTimestamp(event.endDate),
           }));
-          console.log(data);
         } catch (error) {
           console.error("Error fetching events:", error);
         }
@@ -187,8 +188,8 @@ export default {
     };
 
     const handleSaveEvent = async (event) => {
-      if (!userDetails.value || !groupDetails.value) {
-        console.error("User or Group details not loaded yet.");
+      if (!userDetails.value) {
+        console.error("User details not loaded yet.");
         return;
       }
 
@@ -199,7 +200,7 @@ export default {
           description: eventDescription.value,
           startDate: new Date(eventStartDate.value).toISOString(),
           endDate: new Date(eventEndDate.value).toISOString(),
-          status: "Planned",
+          status: "Open",
         },
       };
 
@@ -212,17 +213,31 @@ export default {
           },
           body: JSON.stringify(eventDetails),
         });
-        const data = await res.json();
-        eventList.value.push(data);
-        const modalElement = document.getElementById("addEventModal");
-        if (modalElement) {
-          const modal = bootstrap.Modal.getInstance(modalElement);
+
+        if (res.ok) {
+          const data = await res.json();
+          eventList.value.push(data);
+          const modal = bootstrap.Modal.getInstance(
+            document.getElementById("addEventModal")
+          );
           modal.hide();
+          window.location.reload();
+          eventName.value = "";
+          eventDescription.value = "";
+          eventStartDate.value = "";
+          eventEndDate.value = "";
+        } else {
+          const errorData = await res.json();
+          if (errorData.errors) {
+            errorData.errors.forEach((error) => {
+              alert(error.msg);
+            });
+          } else {
+            throw new Error(
+              `Failed to save event group. Status: ${res.status}`
+            );
+          }
         }
-        eventName.value = "";
-        eventDescription.value = "";
-        eventStartDate.value = "";
-        eventEndDate.value = "";
       } catch (error) {
         console.error("Error creating event:", error);
       }
@@ -268,11 +283,10 @@ export default {
   width: 100%;
   height: 100%;
   justify-content: center;
-  padding: 2rem;
 }
 
 .list-group {
-  width: 50%;
+  width: 35%;
   margin-top: 2rem;
 }
 
