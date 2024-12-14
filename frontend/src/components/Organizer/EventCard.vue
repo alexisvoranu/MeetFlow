@@ -6,7 +6,7 @@
       style="border-radius: 1rem"
     >
       <div class="d-flex w-100 justify-content-center">
-        <h5 class="mb-2">{{ eventDetails?.name }}</h5>
+        <h3 class="my-2">{{ eventDetails?.name }}</h3>
       </div>
       <span
         :class="[
@@ -16,17 +16,20 @@
       >
         {{ eventDetails?.status }}
       </span>
+      <hr class="my-3" />
       <p class="my-2">{{ eventDetails?.description }}</p>
       <div class="mb-1">
         <small>Opens at: {{ formatDate(eventDetails?.startDate) }}</small>
         <br />
         <small>Closes at: {{ formatDate(eventDetails?.endDate) }}</small>
+        <hr class="my-3" />
+
+        <p class="my-2">
+          Access code: <b>{{ eventDetails?.id }}</b>
+        </p>
       </div>
       <div class="d-flex justify-content-center align-items-center">
         <div class="event-actions">
-          <button class="btn btn-danger btn-sm" @click="deleteEvent">
-            Delete event
-          </button>
           <button
             class="btn btn-primary btn-sm"
             data-bs-toggle="modal"
@@ -34,6 +37,12 @@
             @click="openParticipantsModal"
           >
             View participants
+          </button>
+          <button class="btn btn-warning btn-sm" @click="openUpdateModal">
+            Update event
+          </button>
+          <button class="btn btn-danger btn-sm" @click="deleteEvent">
+            Delete event
           </button>
         </div>
       </div>
@@ -114,12 +123,110 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal for Update Event -->
+    <div
+      v-if="isModalOpen"
+      class="modal fade show"
+      id="exampleModal"
+      tabindex="-1"
+      aria-labelledby="exampleModalLabel"
+      aria-modal="true"
+      style="display: block"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">
+              Update event
+            </h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+              @click="closeUpdateModal"
+            ></button>
+          </div>
+          <div class="updateModal-body">
+            <form @submit.prevent="updateEvent">
+              <div class="mb-3">
+                <label for="eventName" class="form-label"
+                  >Event Group Name</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="eventName"
+                  placeholder="Please enter a name for the event group"
+                  v-model="eventName"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="eventDescription" class="form-label"
+                  >Event Group Description</label
+                >
+                <textarea
+                  class="form-control"
+                  id="eventDescription"
+                  rows="4"
+                  placeholder="Please enter a description for the event group"
+                  v-model="eventDescription"
+                  required
+                ></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="eventName" class="form-label"
+                  >Event Start Date</label
+                >
+                <input
+                  type="datetime-local"
+                  class="form-control"
+                  id="eventStartDate"
+                  placeholder="Please enter a name for the event group"
+                  v-model="eventStartDate"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="eventName" class="form-label">Event End Date</label>
+                <input
+                  type="datetime-local"
+                  class="form-control"
+                  id="eventEndDate"
+                  placeholder="Please enter a name for the event group"
+                  v-model="eventEndDate"
+                  required
+                />
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-bs-dismiss="modal"
+                  @click="closeUpdateModal"
+                >
+                  Close
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-success"
+                  :disabled="isUpdating"
+                >
+                  {{ isUpdating ? "Updating..." : "Update" }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
-
 <script>
 import { SERVER_URL } from "@/constants";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import * as XLSX from "xlsx";
 
 export default {
@@ -131,12 +238,28 @@ export default {
     const modalContent = ref("token");
     const confirmedParticipantsList = ref([]);
     const userDetails = ref(null);
+    const isModalOpen = ref(false);
+    const eventName = ref("");
+    const eventDescription = ref("");
+    const eventStartDate = ref("");
+    const eventEndDate = ref("");
+    const isUpdating = ref(false);
 
     const getUserDetailsFromLocalStorage = () => {
       const storedUserDetails = localStorage.getItem("userDetails");
       if (storedUserDetails) {
         userDetails.value = JSON.parse(storedUserDetails);
       }
+    };
+
+    const formatDateForInput = (dateString) => {
+      const date = new Date(dateString);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      const hours = String(date.getHours()).padStart(2, "0");
+      const minutes = String(date.getMinutes()).padStart(2, "0");
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
     };
 
     const formatDate = (dateString) => {
@@ -146,8 +269,9 @@ export default {
         day: "2-digit",
         hour: "2-digit",
         minute: "2-digit",
+        timeZone: "UTC",
       };
-      return new Date(dateString).toLocaleDateString("ro-RO", options);
+      return new Date(dateString).toLocaleString("ro-RO", options);
     };
 
     const handleModalContentChange = (content) => {
@@ -233,7 +357,55 @@ export default {
       }
     };
 
-    getUserDetailsFromLocalStorage();
+    const openUpdateModal = () => {
+      isModalOpen.value = true;
+      eventName.value = props.eventDetails.name;
+      eventDescription.value = props.eventDetails.description;
+      eventStartDate.value = formatDateForInput(props.eventDetails.startDate);
+      eventEndDate.value = formatDateForInput(props.eventDetails.endDate);
+    };
+
+    const closeUpdateModal = () => {
+      isModalOpen.value = false;
+    };
+
+    const updateEvent = async () => {
+      isUpdating.value = true;
+      try {
+        const res = await fetch(
+          `${SERVER_URL}/events/updateEventInEventGroup`,
+          {
+            method: "PATCH",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("firebaseToken")}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: userDetails.value.email,
+              eventId: props.eventDetails.id,
+              name: eventName.value,
+              description: eventDescription.value,
+              startDate: eventStartDate.value,
+              endDate: eventEndDate.value,
+            }),
+          }
+        );
+        if (res.ok) {
+          closeUpdateModal();
+          window.location.reload();
+        } else {
+          console.error("Failed to update event group:", await res.json());
+        }
+      } catch (error) {
+        console.error("Error updating event group:", error);
+      } finally {
+        isUpdating.value = false;
+      }
+    };
+
+    onMounted(() => {
+      getUserDetailsFromLocalStorage();
+    });
 
     return {
       modalContent,
@@ -243,6 +415,15 @@ export default {
       openParticipantsModal,
       deleteEvent,
       downloadConfirmedParticipantsInXLSX,
+      openUpdateModal,
+      closeUpdateModal,
+      updateEvent,
+      isModalOpen,
+      eventName,
+      eventDescription,
+      eventStartDate,
+      eventEndDate,
+      isUpdating,
     };
   },
 };
@@ -253,6 +434,14 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  border-radius: 1rem;
+}
+
+.updateModal-body {
+  justify-content: center;
+  padding: 20px;
   align-items: center;
   gap: 2rem;
   border-radius: 1rem;

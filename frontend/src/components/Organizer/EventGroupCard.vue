@@ -27,23 +27,25 @@
     <!-- Modal -->
     <div
       v-if="isModalOpen"
-      class="modal fade"
+      class="modal fade show"
       id="exampleModal"
       tabindex="-1"
       aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
+      aria-modal="true"
+      style="display: block"
     >
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
             <h1 class="modal-title fs-5" id="exampleModalLabel">
-              Add event group
+              Update event group
             </h1>
             <button
               type="button"
               class="btn-close"
               data-bs-dismiss="modal"
               aria-label="Close"
+              @click="closeUpdateModal"
             ></button>
           </div>
           <div class="modal-body">
@@ -63,7 +65,7 @@
               </div>
               <div class="mb-3">
                 <label for="eventGroupDescription" class="form-label"
-                  >Event group Description</label
+                  >Event Group Description</label
                 >
                 <textarea
                   class="form-control"
@@ -84,12 +86,11 @@
                   Close
                 </button>
                 <button
-                  type="button"
-                  class="btn btn-warning"
-                  data-bs-toggle="modal"
-                  data-bs-target="#exampleModal"
+                  type="submit"
+                  class="btn btn-success"
+                  :disabled="isUpdating"
                 >
-                  Update
+                  {{ isUpdating ? "Updating..." : "Update" }}
                 </button>
               </div>
             </form>
@@ -127,7 +128,7 @@ export default {
     const isModalOpen = ref(false);
     const eventGroupName = ref(props.groupName);
     const eventGroupDescription = ref(props.description);
-    console.log;
+    const isUpdating = ref(false);
 
     const getUserDetailsFromLocalStorage = () => {
       const storedUserDetails = localStorage.getItem("userDetails");
@@ -211,38 +212,41 @@ export default {
 
     const openUpdateModal = () => {
       isModalOpen.value = true;
-      document.getElementById("exampleModal").classList.add("show");
-      document.getElementById("exampleModal").style.display = "block";
-      document.getElementById("exampleModal").setAttribute("aria-modal", true);
-      document
-        .getElementById("exampleModal")
-        .setAttribute("aria-hidden", false);
     };
 
     const closeUpdateModal = () => {
       isModalOpen.value = false;
-      document.getElementById("exampleModal").classList.remove("show");
-      document.getElementById("exampleModal").style.display = "none";
-      document.getElementById("exampleModal").setAttribute("aria-modal", false);
-      document.getElementById("exampleModal").setAttribute("aria-hidden", true);
     };
 
     const updateEventGroup = async () => {
+      isUpdating.value = true;
       try {
-        const res = await fetch(`${SERVER_URL}/eventGroups/updateEventGroup`, {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("firebaseToken")}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            id: props.id,
-            groupName: eventGroupName.value,
-            description: eventGroupDescription.value,
-          }),
-        });
+        const res = await fetch(
+          `${SERVER_URL}/eventGroups/updateEventGroupForOrganizer`,
+          {
+            method: "PATCH",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("firebaseToken")}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: userDetails.value.email,
+              eventGroupId: props.id,
+              groupName: eventGroupName.value,
+              description: eventGroupDescription.value,
+            }),
+          }
+        );
+        if (res.ok) {
+          closeUpdateModal();
+          window.location.reload();
+        } else {
+          console.error("Failed to update event group:", await res.json());
+        }
       } catch (error) {
         console.error("Error updating event group:", error);
+      } finally {
+        isUpdating.value = false;
       }
     };
 
@@ -259,6 +263,7 @@ export default {
       isModalOpen,
       eventGroupName,
       eventGroupDescription,
+      isUpdating,
     };
   },
 };
@@ -289,7 +294,7 @@ export default {
 .card-actions {
   width: 100%;
   display: flex;
-  justify-content: space-between;
+  justify-content: space-evenly;
   gap: 0.5rem;
 }
 </style>

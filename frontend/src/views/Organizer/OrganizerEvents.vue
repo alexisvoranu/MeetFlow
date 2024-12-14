@@ -172,14 +172,6 @@ export default {
           const data = await res.json();
           eventList.value = data.map((event) => ({
             ...event,
-            startDate:
-              event.startDate instanceof Date
-                ? event.startDate.toISOString()
-                : formatFirestoreTimestamp(event.startDate),
-            endDate:
-              event.endDate instanceof Date
-                ? event.endDate.toISOString()
-                : formatFirestoreTimestamp(event.endDate),
           }));
         } catch (error) {
           console.error("Error fetching events:", error);
