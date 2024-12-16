@@ -31,6 +31,7 @@
 import { ref } from "vue";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "vue-router";
+import { SERVER_URL } from "@/constants";
 
 export default {
   name: "LoginForm",
@@ -52,47 +53,75 @@ export default {
         return;
       }
 
-      try {
-        const auth = getAuth();
-        const userCredential = await signInWithEmailAndPassword(
-          auth,
-          email.value,
-          password.value
-        );
+      const response = await fetch(
+        `${SERVER_URL}/participants/getAllParticipants`,
+        {
+          method: "GET",
+        }
+      );
 
-        const token = await userCredential.user.getIdToken();
-        localStorage.setItem("firebaseToken", token);
+      if (!response.ok) {
+        errMsg.value =
+          "Failed to verify participant status. Please try again later.";
+        return;
+      }
 
-        const user = userCredential.user;
-        const userName = user.displayName;
-        const userEmail = user.email;
+      const participants = await response.json();
+      const isParticipant = participants.some(
+        (participant) => participant.email === email.value
+      );
 
-        const userDetails = {
-          email: userEmail,
-          name: userName,
-        };
+      if (
+        (!isParticipant && props.userRole === "participant") ||
+        (isParticipant && props.userRole === "organizer")
+      ) {
+        const roleText =
+          props.userRole === "participant" ? "a participant" : "an organizer";
+        errMsg.value = `This user is not registered as ${roleText}.`;
+        return;
+      } else {
+        try {
+          const auth = getAuth();
+          const userCredential = await signInWithEmailAndPassword(
+            auth,
+            email.value,
+            password.value
+          );
 
-        localStorage.setItem("userDetails", JSON.stringify(userDetails));
+          const token = await userCredential.user.getIdToken();
+          localStorage.setItem("firebaseToken", token);
 
-        const redirectPath =
-          props.userRole === "organizer"
-            ? "/organizerHome"
-            : "/participantHome";
-        router.push(redirectPath);
-      } catch (error) {
-        switch (error.code) {
-          case "auth/invalid-email":
-            errMsg.value = "This email is invalid!";
-            break;
-          case "auth/user-not-found":
-            errMsg.value = "No account with this email was found!";
-            break;
-          case "auth/wrong-password":
-            errMsg.value = "The password is incorrect!";
-            break;
-          default:
-            errMsg.value = "Email or password is incorrect!";
-            break;
+          const user = userCredential.user;
+          const userName = user.displayName;
+          const userEmail = user.email;
+
+          const userDetails = {
+            email: userEmail,
+            name: userName,
+          };
+
+          localStorage.setItem("userDetails", JSON.stringify(userDetails));
+
+          const redirectPath =
+            props.userRole === "organizer"
+              ? "/organizerHome"
+              : "/participantHome";
+          router.push(redirectPath);
+        } catch (error) {
+          switch (error.code) {
+            case "auth/invalid-email":
+              errMsg.value = "This email is invalid!";
+              break;
+            case "auth/user-not-found":
+              errMsg.value = "No account with this email was found!";
+              break;
+            case "auth/wrong-password":
+              errMsg.value = "The password is incorrect!";
+              break;
+            default:
+              errMsg.value = "Email or password is incorrect!";
+              break;
+          }
         }
       }
     };

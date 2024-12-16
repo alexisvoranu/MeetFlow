@@ -24,9 +24,9 @@
             <button
               class="nav-link active"
               aria-current="page"
-              @click="navigate('/participant/events/all')"
+              @click="navigate('/participantEvents')"
             >
-              Attend Event
+              My Events
             </button>
           </li>
         </ul>

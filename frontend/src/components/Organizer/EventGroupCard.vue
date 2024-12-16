@@ -153,7 +153,6 @@ export default {
           throw new Error(`Error: ${res.status}`);
         }
         const data = await res.json();
-        console.log(data);
         window.location.reload();
       } catch (err) {
         console.error(err);

@@ -1,7 +1,10 @@
 import express from "express";
 import * as participantsController from "../controllers/participants.js";
+import * as eventService from "../services/events.js";
 
 export const router = express.Router();
+
+router.get("/getAllParticipants", participantsController.getAllParticipants);
 
 router.get(
   "/getParticipantsForEventGroup",
@@ -9,9 +12,9 @@ router.get(
 );
 
 router.get(
-    "/getParticipantsForEvent",
-    participantsController.getParticipantsForEvent
-  );
+  "/getParticipantsForEvent",
+  participantsController.getParticipantsForEvent
+);
 
 router.post(
   "/addParticipantToEvent",

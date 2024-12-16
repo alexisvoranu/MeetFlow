@@ -25,7 +25,7 @@
         <hr class="my-3" />
 
         <p class="my-2">
-          Access code: <b>{{ eventDetails?.id }}</b>
+          Access token: <b>{{ eventDetails?.id }}</b>
         </p>
       </div>
       <div class="d-flex justify-content-center align-items-center">
@@ -269,7 +269,7 @@ export default {
         day: "2-digit",
         hour: "2-digit",
         minute: "2-digit",
-        timeZone: "UTC",
+        timeZone: "Europe/Bucharest",
       };
       return new Date(dateString).toLocaleString("ro-RO", options);
     };
@@ -295,7 +295,6 @@ export default {
       )
         .then((response) => response.json())
         .then((data) => {
-          console.log(data);
           confirmedParticipantsList.value = Array.isArray(data) ? data : [];
         })
         .catch((err) => {

@@ -1,5 +1,28 @@
 import admin from "../firebase/firebase-admin.js";
 
+export const getAllParticipants = async (req, res) => {
+  try {
+    const snapshot = await admin.firestore().collection("participants").get();
+
+    const participants = [];
+
+    snapshot.forEach((doc) => {
+      participants.push({ id: doc.id, ...doc.data() });
+    });
+
+    if (participants.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No participants found in the database." });
+    }
+
+    res.status(200).json(participants);
+  } catch (err) {
+    console.error("Error fetching participants:", err);
+    res.status(500).json({ message: "Failed to fetch participants." });
+  }
+};
+
 export const getParticipantsForEvent = async (req, res) => {
   const { eventId } = req.query;
 
@@ -129,6 +152,10 @@ export const addParticipantToEvent = async (req, res) => {
 
     if (!targetEvent) {
       return res.status(404).json({ message: "Event not found." });
+    }
+
+    if (targetEvent.status === "Closed") {
+      return res.status(403).json({ message: "The event is closed." });
     }
 
     if (!targetEvent.participants) {

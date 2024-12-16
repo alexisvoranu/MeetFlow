@@ -228,8 +228,7 @@ export default {
     #0c829a
   );
   width: 100%;
-  min-height: 100vh;
-  height: 100%;
+  height: 93.25vh;
 }
 
 .event-groups-cards {

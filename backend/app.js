@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import authenticateToken from "./middlewares/authenticateToken.js";
 import { router } from "./routes/config.js";
 import cors from "cors";
+import { verifyEventsStartedChroneJob } from "./verifyEventsStartedChroneJob.js";
 
 dotenv.config();
 
@@ -21,4 +22,5 @@ const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
   console.log(`The server is running at: http://localhost:${PORT}`);
+  verifyEventsStartedChroneJob();
 });
