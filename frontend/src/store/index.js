@@ -1,21 +1,13 @@
 import { createStore } from "vuex";
+import events from "./modules/participantEvents";
+import organizerEvents from "./modules/organizerEvents.js";
+import eventGroups from "./modules/eventGroups";
 
 const store = createStore({
-  state: {
-    message: "Salut din Vuex!",
-  },
-  mutations: {
-    setMessage(state, newMessage) {
-      state.message = newMessage;
-    },
-  },
-  actions: {
-    updateMessage({ commit }, newMessage) {
-      commit("setMessage", newMessage);
-    },
-  },
-  getters: {
-    message: (state) => state.message,
+  modules: {
+    events,
+    organizerEvents,
+    eventGroups,
   },
 });
 

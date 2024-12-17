@@ -240,7 +240,12 @@ export default {
           closeUpdateModal();
           window.location.reload();
         } else {
-          console.error("Failed to update event group:", await res.json());
+          const errorData = await res.json();
+          if (errorData.errors) {
+            errorData.errors.forEach((error) => {
+              alert(error.msg);
+            });
+          }
         }
       } catch (error) {
         console.error("Error updating event group:", error);
@@ -293,7 +298,7 @@ export default {
 .card-actions {
   width: 100%;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-between;
   gap: 0.5rem;
 }
 </style>

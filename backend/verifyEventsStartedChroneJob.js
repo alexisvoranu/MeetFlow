@@ -2,7 +2,7 @@ import cron from "node-cron";
 import * as eventsService from "../backend/services/events.js";
 
 const verifyEventsStartedChroneJob = () => {
-  cron.schedule("1/1 * * * *", async () => {
+  cron.schedule("*/1 * * * *", async () => {
     try {
       const eventsList = await eventsService.getAllEvents();
 

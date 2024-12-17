@@ -37,10 +37,10 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
-    path: "/organizer/events", 
-    name: "allEventsForOrganizer", 
-    component: OrganizerEvents, 
-    props: (route) => ({ groupId: route.query.groupId }), 
+    path: "/organizer/events",
+    name: "allEventsForOrganizer",
+    component: OrganizerEvents,
+    props: (route) => ({ groupId: route.query.groupId }),
   },
   {
     path: "/participantEvents",

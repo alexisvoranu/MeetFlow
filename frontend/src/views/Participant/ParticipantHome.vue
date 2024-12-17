@@ -80,7 +80,6 @@ export default {
   }
 }
 
-/* The typewriter cursor effect */
 @keyframes blink-caret {
   from,
   to {

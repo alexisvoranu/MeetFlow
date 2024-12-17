@@ -84,6 +84,15 @@
               </div>
             </form>
           </div>
+          <!-- Alert container -->
+          <div
+            v-if="alert.show"
+            :class="`alert ${alert.type} d-flex align-items-center`"
+            role="alert"
+            style="margin: 0px 20px 20px 20px"
+          >
+            <div>{{ alert.message }}</div>
+          </div>
         </div>
       </div>
     </div>
@@ -93,8 +102,8 @@
 <script>
 import EventGroupCard from "@/components/Organizer/EventGroupCard.vue";
 import OrganizerNavbar from "@/components/Organizer/OrganizerNavbar.vue";
-import { SERVER_URL } from "@/constants";
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, computed } from "vue";
+import { useStore } from "vuex";
 import * as bootstrap from "bootstrap";
 window.Modal = bootstrap.Modal;
 
@@ -105,42 +114,22 @@ export default {
     OrganizerNavbar,
   },
   setup() {
-    const userDetails = ref(null);
-    const eventGroupsList = ref([]);
+    const store = useStore();
+
     const eventGroupName = ref("");
     const eventGroupDescription = ref("");
 
-    const getUserDetailsFromLocalStorage = () => {
+    const eventGroupsList = computed(
+      () => store.getters["eventGroups/eventGroups"]
+    );
+    const alert = computed(() => store.getters["eventGroups/alert"]);
+
+    const fetchEventGroups = () => {
       const storedUserDetails = localStorage.getItem("userDetails");
       if (storedUserDetails) {
-        userDetails.value = JSON.parse(storedUserDetails);
-      }
-    };
-
-    const getEventGroupsForOrganizer = async () => {
-      if (userDetails.value) {
-        fetch(
-          `${SERVER_URL}/eventGroups/getAllEventGroupsForOrganizer?email=${userDetails.value.email}`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("firebaseToken")}`,
-              "Content-Type": "application/json",
-            },
-          }
-        )
-          .then((res) => {
-            if (!res.ok) {
-              throw new Error(`HTTP error! Status: ${res.status}`);
-            }
-            return res.json();
-          })
-          .then((data) => {
-            eventGroupsList.value = data.eventGroups;
-          })
-          .catch((error) => {
-            console.error("Error fetching event groups:", error);
-          });
+        const userDetails = JSON.parse(storedUserDetails);
+        store.commit("eventGroups/SET_ORGANIZER_EMAIL", userDetails.email);
+        store.dispatch("eventGroups/fetchEventGroups");
       }
     };
 
@@ -150,67 +139,21 @@ export default {
         return;
       }
 
-      const groupDetails = {
-        email: userDetails.value.email,
-        eventGroup: {
-          groupName: eventGroupName.value,
-          description: eventGroupDescription.value,
-        },
+      const eventGroupDetails = {
+        groupName: eventGroupName.value,
+        description: eventGroupDescription.value,
       };
 
-      try {
-        const response = await fetch(
-          `${SERVER_URL}/eventGroups/addEventGroupToOrganizer`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("firebaseToken")}`,
-            },
-            body: JSON.stringify(groupDetails),
-          }
-        );
-
-        if (response.status === 200) {
-          const modal = bootstrap.Modal.getInstance(
-            document.getElementById("exampleModal")
-          );
-          modal.hide();
-          window.location.reload();
-        } else {
-          const data = await response.json();
-          if (data.errors) {
-            data.errors.forEach((error) => {
-              alert(error.msg);
-            });
-          } else {
-            throw new Error(
-              `Failed to save event group. Status: ${response.status}`
-            );
-          }
-        }
-      } catch (error) {
-        console.error("Error saving event group:", error);
-        alert(
-          "An error occurred while saving the event group. Please try again later."
-        );
-      }
+      await store.dispatch("eventGroups/saveEventGroup", eventGroupDetails);
     };
-    onMounted(() => {
-      getUserDetailsFromLocalStorage();
-    });
 
-    watch(userDetails, () => {
-      if (userDetails.value) {
-        getEventGroupsForOrganizer();
-      }
-    });
+    onMounted(fetchEventGroups);
 
     return {
-      userDetails,
-      eventGroupsList,
+      alert,
       eventGroupName,
       eventGroupDescription,
+      eventGroupsList,
       handleSaveEventGroup,
     };
   },
@@ -282,6 +225,6 @@ export default {
 }
 
 #card {
-  width: 40%;
+  width: 35%;
 }
 </style>

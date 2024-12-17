@@ -10,10 +10,10 @@
       Add event
     </button>
 
-    <div v-if="eventList && eventList.length > 0" class="events-list">
+    <div v-if="events && events.length > 0" class="events-list">
       <div class="list-group">
         <EventCard
-          v-for="event in eventList"
+          v-for="event in events"
           :key="event.id"
           :eventDetails="event"
         />
@@ -105,6 +105,15 @@
               </div>
             </form>
           </div>
+          <!-- Alert container -->
+          <div
+            v-if="alert.show"
+            :class="`alert ${alert.type} d-flex align-items-center`"
+            role="alert"
+            style="margin: 0px 20px 20px 20px"
+          >
+            <div>{{ alert.message }}</div>
+          </div>
         </div>
       </div>
     </div>
@@ -114,9 +123,9 @@
 <script>
 import EventCard from "@/components/Organizer/EventCard.vue";
 import OrganizerNavbar from "@/components/Organizer/OrganizerNavbar.vue";
-import { SERVER_URL } from "@/constants";
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
+import { useStore } from "vuex";
 import * as bootstrap from "bootstrap";
 window.Modal = bootstrap.Modal;
 
@@ -127,129 +136,53 @@ export default {
     EventCard,
   },
   setup() {
+    const store = useStore();
     const route = useRoute();
-    const groupId = route.query.groupId;
-    const userDetails = ref(null);
+
     const eventName = ref("");
     const eventDescription = ref("");
     const eventStartDate = ref("");
     const eventEndDate = ref("");
-    const eventList = ref([]);
-    const groupDetails = ref(null);
+
+    const alert = computed(() => store.getters["organizerEvents/alert"]);
+    const events = computed(() => store.getters["organizerEvents/events"]);
+    const groupId = route.query.groupId;
 
     const getUserDetailsFromLocalStorage = () => {
       const storedUserDetails = localStorage.getItem("userDetails");
       if (storedUserDetails) {
-        userDetails.value = JSON.parse(storedUserDetails);
+        const userDetails = JSON.parse(storedUserDetails);
       }
     };
 
-    const formatFirestoreTimestamp = (timestamp) => {
-      if (timestamp && timestamp._seconds && timestamp._nanoseconds) {
-        const date = new Date(
-          timestamp._seconds * 1000 + timestamp._nanoseconds / 1000000
-        );
-        return date.toISOString();
-      }
-      return null;
+    const fetchEvents = () => {
+      store.commit("organizerEvents/SET_GROUP_ID", groupId);
+      store.dispatch("organizerEvents/fetchEventsByGroup");
     };
 
-    const getEventsByEventGroup = async () => {
-      if (groupId) {
-        try {
-          const res = await fetch(
-            `${SERVER_URL}/events/getEventsByEventsGroup?eventGroupId=${groupId}`,
-            {
-              method: "GET",
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem(
-                  "firebaseToken"
-                )}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
-          const data = await res.json();
-          eventList.value = data.map((event) => ({
-            ...event,
-          }));
-        } catch (error) {
-          console.error("Error fetching events:", error);
-        }
-      }
-    };
-
-    const handleSaveEvent = async (event) => {
-      if (!userDetails.value) {
-        console.error("User details not loaded yet.");
-        return;
-      }
-
-      const eventDetails = {
-        eventGroupId: groupId,
-        event: {
-          name: eventName.value,
-          description: eventDescription.value,
-          startDate: new Date(eventStartDate.value).toISOString(),
-          endDate: new Date(eventEndDate.value).toISOString(),
-          status: "Open",
-        },
+    const handleSaveEvent = async () => {
+      const newEvent = {
+        name: eventName.value,
+        description: eventDescription.value,
+        startDate: new Date(eventStartDate.value).toISOString(),
+        endDate: new Date(eventEndDate.value).toISOString(),
       };
 
-      try {
-        const res = await fetch(`${SERVER_URL}/events/addEventToEventGroup`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("firebaseToken")}`,
-          },
-          body: JSON.stringify(eventDetails),
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          eventList.value.push(data);
-          const modal = bootstrap.Modal.getInstance(
-            document.getElementById("addEventModal")
-          );
-          modal.hide();
-          window.location.reload();
-          eventName.value = "";
-          eventDescription.value = "";
-          eventStartDate.value = "";
-          eventEndDate.value = "";
-        } else {
-          const errorData = await res.json();
-          if (errorData.errors) {
-            errorData.errors.forEach((error) => {
-              alert(error.msg);
-            });
-          } else {
-            throw new Error(
-              `Failed to save event group. Status: ${res.status}`
-            );
-          }
-        }
-      } catch (error) {
-        console.error("Error creating event:", error);
-      }
+      await store.dispatch("organizerEvents/saveEvent", newEvent);
     };
 
     onMounted(() => {
       getUserDetailsFromLocalStorage();
-      getEventsByEventGroup();
+      fetchEvents();
     });
 
-    watch(() => userDetails.value, getEventsByEventGroup);
-
-    watch(() => groupId, getEventsByEventGroup, { immediate: true });
-
     return {
+      alert,
+      events,
       eventName,
       eventDescription,
       eventStartDate,
       eventEndDate,
-      eventList,
       handleSaveEvent,
     };
   },

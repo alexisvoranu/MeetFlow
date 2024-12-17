@@ -1,6 +1,6 @@
 <template>
   <div class="main-container-participant-events">
-    <ParticipantNavbar :user-details="userDetails" v-if="userDetails" />
+    <ParticipantNavbar />
 
     <button
       type="button"
@@ -84,95 +84,35 @@
 </template>
 
 <script>
-import { ref, reactive, onMounted, watch } from "vue";
-import ParticipantNavbar from "@/components/Participant/ParticipantNavbar.vue";
-import { SERVER_URL } from "@/constants";
 import ParticipantEventCard from "@/components/Participant/ParticipantEventCard.vue";
+import ParticipantNavbar from "@/components/Participant/ParticipantNavbar.vue";
+import { computed, ref, onMounted } from "vue";
+import { useStore } from "vuex";
 
 export default {
   name: "ParticipantEvents",
   components: { ParticipantNavbar, ParticipantEventCard },
   setup() {
-    const userDetails = ref(null);
+    const store = useStore();
     const modalContent = ref("token");
     const accessToken = ref("");
-    const alert = reactive({ show: false, type: "", message: "" });
-    const events = ref([]);
+    const userDetails = ref(null);
 
-    const fetchEvents = async () => {
+    const alert = computed(() => store.getters["events/alert"]);
+    const events = computed(() => store.getters["events/events"]);
+
+    const fetchEvents = () => {
       if (userDetails.value && userDetails.value.email) {
-        try {
-          const res = await fetch(
-            `${SERVER_URL}/events/getEventsForParticipant?email=${userDetails.value.email}`,
-            {
-              method: "GET",
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem(
-                  "firebaseToken"
-                )}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
-
-          if (!res.ok) {
-            const errorData = await res.json();
-            const errorMessage =
-              errorData.message || `HTTP error! status: ${res.status}`;
-            throw new Error(errorMessage);
-          }
-
-          events.value = await res.json();
-        } catch (error) {
-          console.error("Error fetching events:", error);
-        }
+        store.dispatch("events/fetchEvents", userDetails.value.email);
       }
     };
 
-    const handleTokenSubmit = async () => {
-      const attendEventRequest = {
-        eventId: accessToken.value,
-        participantEmail: userDetails.value.email,
-      };
-
-      try {
-        const res = await fetch(
-          `${SERVER_URL}/participants/addParticipantToEvent`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("firebaseToken")}`,
-            },
-            body: JSON.stringify(attendEventRequest),
-          }
-        );
-
-        const data = await res.json();
-        switch (res.status) {
-          case 403:
-            alert.show = true;
-            alert.type = "alert-danger";
-            alert.message =
-              "The event is closed. You can no longer participate in this event.";
-            break;
-          case 404:
-            alert.show = true;
-            alert.type = "alert-danger";
-            alert.message = "Invalid token. The event is not found.";
-            break;
-          case 200:
-            window.location.reload();
-            break;
-        }
-
-        setTimeout(() => {
-          alert.show = false;
-          alert.type = "";
-          alert.message = "";
-        }, 3000);
-      } catch (error) {
-        console.error("Error:", error);
+    const handleTokenSubmit = () => {
+      if (accessToken.value && userDetails.value.email) {
+        store.dispatch("events/handleTokenSubmit", {
+          eventId: accessToken.value,
+          email: userDetails.value.email,
+        });
       }
     };
 
@@ -196,13 +136,11 @@ export default {
       const storedUserDetails = localStorage.getItem("userDetails");
       if (storedUserDetails) {
         userDetails.value = JSON.parse(storedUserDetails);
+        fetchEvents();
       }
     });
 
-    watch(userDetails, fetchEvents);
-
     return {
-      userDetails,
       modalContent,
       accessToken,
       alert,
