@@ -115,7 +115,10 @@ export default {
   margin-bottom: 15px;
 }
 
-@media screen and (max-width: 700px) {
+@media screen and (max-width: 900px) {
+  .login-container {
+    padding: 15px;
+  }
   .login-form {
     width: 100%;
   }

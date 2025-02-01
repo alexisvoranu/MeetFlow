@@ -118,7 +118,10 @@ export default {
   margin-bottom: 15px;
 }
 
-@media screen and (max-width: 700px) {
+@media screen and (max-width: 900px) {
+  .sign-up-container {
+    padding: 15px;
+  }
   .sign-up-form {
     width: 100%;
   }

@@ -2,7 +2,7 @@
   <div>
     <!-- Event Card -->
     <div
-      class="list-group-item list-group-item-action my-3"
+      class="list-group-item list-group-item-action my-4"
       style="border-radius: 1rem"
     >
       <div class="d-flex w-100 justify-content-center">

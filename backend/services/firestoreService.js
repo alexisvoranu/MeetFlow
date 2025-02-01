@@ -2,50 +2,51 @@ import { collection, addDoc } from "firebase/firestore";
 import { db } from "../firebase/firebase.js";
 import { faker } from "@faker-js/faker";
 
-const addDocument = async (collectionName, data) => {
+export const addDocument = async (collectionName, data) => {
   try {
     const colRef = collection(db, collectionName);
     const docRef = await addDoc(colRef, data);
-    console.log("Document adăugat cu ID-ul: ", docRef.id);
+    console.log("Document added with ID: ", docRef.id);
     return docRef.id;
   } catch (e) {
-    console.error("Eroare la adăugarea documentului: ", e);
+    console.error("Eroare at document adding: ", e);
     return null;
   }
 };
 
-async function generateEventOrganizers(count = 3) {
+export async function generateEvents(count) {
   const eventOrganizers = [];
+  const participantsCollection = new Set();
 
   for (let i = 0; i < count; i++) {
     const eventGroups = [];
-    const numberOfGroups = faker.number.int({ min: 1, max: 3 });
+    const numberOfGroups = faker.number.int({ min: 2, max: 4 });
 
     for (let j = 0; j < numberOfGroups; j++) {
       const events = [];
-      const numberOfEvents = faker.number.int({ min: 1, max: 5 });
+      const numberOfEvents = faker.number.int({ min: 3, max: 7 });
 
       for (let k = 0; k < numberOfEvents; k++) {
-        const participants = Array(faker.number.int({ min: 5, max: 10 }))
+        const participants = Array(faker.number.int({ min: 5, max: 30 }))
           .fill()
-          .map(() => ({
-            name: faker.person.fullName(),
-            email: faker.internet.email(),
-          }));
+          .map(() => {
+            const participant = {
+              name: faker.person.fullName(),
+              email: faker.internet.email(),
+            };
+
+            participantsCollection.add(JSON.stringify(participant));
+
+            return participant;
+          });
 
         events.push({
           id: faker.string.uuid(),
           name: faker.company.name() + " Event",
           description: faker.lorem.sentence(),
-          startDate: faker.date.future(),
-          endDate: faker.date.future({
-            refDate: new Date(Date.now() + 1000 * 60 * 60 * 24),
-          }),
-          status: faker.helpers.arrayElement([
-            "planned",
-            "ongoing",
-            "completed",
-          ]),
+          startDate: faker.date.future().toISOString(),
+          endDate: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString(),
+          status: faker.helpers.arrayElement(["Open", "Closed"]),
           participants,
         });
       }
@@ -65,7 +66,11 @@ async function generateEventOrganizers(count = 3) {
     });
   }
 
-  return eventOrganizers;
+  const uniqueParticipants = Array.from(participantsCollection)
+    .map((participant) => JSON.parse(participant))
+    .slice(0, 40);
+
+  return { eventOrganizers, uniqueParticipants };
 }
 
 export const addEventOrganizersToFirebase = async () => {
@@ -79,5 +84,5 @@ export const addEventOrganizersToFirebase = async () => {
     }
   }
 
-  console.log("Toate datele au fost adăugate în Firebase!");
+  console.log("The data has been added to Firebase!");
 };

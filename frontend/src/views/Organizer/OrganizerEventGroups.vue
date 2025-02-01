@@ -171,7 +171,7 @@ export default {
     #0c829a
   );
   width: 100%;
-  height: 93.25vh;
+  min-height: 93.25vh;
 }
 
 .event-groups-cards {
@@ -181,7 +181,6 @@ export default {
   justify-content: center;
   align-items: flex-start;
   gap: 1rem;
-  padding: 1rem;
 }
 
 .event-group-card {
@@ -193,17 +192,47 @@ export default {
   .event-group-card {
     flex-basis: 100%;
   }
-}
-
-@media (min-width: 601px) and (max-width: 1000px) {
-  .event-group-card {
-    flex-basis: calc(50% - 1rem);
+  #card {
+    width: 100%;
+  }
+  .event-groups-cards {
+    padding: 0rem;
   }
 }
 
-@media (min-width: 1001px) {
+@media (min-width: 601px) and (max-width: 1200px) {
+  .event-group-card {
+    flex-basis: calc(50% - 1rem);
+  }
+  #card {
+    width: 80%;
+  }
+  .event-groups-cards {
+    padding: 0rem;
+  }
+}
+
+@media (min-width: 1201px) and (max-width: 1500px) {
+  .event-group-card {
+    flex-basis: calc(50% - 1rem);
+  }
+  #card {
+    width: 60%;
+  }
+  .event-groups-cards {
+    padding: 0rem;
+  }
+}
+
+@media (min-width: 1501px) {
   .event-group-card {
     flex-basis: calc(33.33% - 1rem);
+  }
+  #card {
+    width: 40%;
+  }
+  .event-groups-cards {
+    padding: 1rem;
   }
 }
 
@@ -222,9 +251,5 @@ export default {
   margin-top: 2rem;
   margin-right: 2rem;
   align-self: flex-end;
-}
-
-#card {
-  width: 35%;
 }
 </style>

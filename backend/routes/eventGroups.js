@@ -18,6 +18,8 @@ router.post(
   eventGroupController.addEventGroupForOrganizer
 );
 
+router.post("/generateData", eventGroupController.generateData);
+
 router.patch(
   "/updateEventGroupForOrganizer",
   validateEventGroupPatch,

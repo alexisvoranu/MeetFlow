@@ -208,15 +208,39 @@ export default {
   width: 100%;
   height: 100%;
   justify-content: center;
-}
-
-.list-group {
-  width: 35%;
-  margin-top: 2rem;
+  padding-bottom: 5%;
 }
 
 .event-actions {
   display: flex;
   gap: 0.5rem;
+}
+
+@media (max-width: 600px) {
+  .list-group {
+    width: 100%;
+    margin: 0.5rem;
+  }
+}
+
+@media (min-width: 601px) and (max-width: 1000px) {
+  .list-group {
+    width: 90%;
+    margin: 1rem;
+  }
+}
+
+@media (min-width: 1001px) and (max-width: 1500px) {
+  .list-group {
+    width: 70%;
+    margin: 1rem;
+  }
+}
+
+@media (min-width: 1501px) {
+  .list-group {
+    width: 40%;
+    margin-top: 2rem;
+  }
 }
 </style>

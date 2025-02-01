@@ -3,21 +3,18 @@
     <HomeNavbar />
     <div className="container">
       <div className="home-header">Welcome to MeetFlow!</div>
-      <div className="home-text">A solution for attendance tracking</div>
+      <div className="home-text">A solution for events attendance tracking</div>
     </div>
-    <AddDocument />
   </div>
 </template>
 
 <script>
-import AddDocument from "@/components/AddDocument.vue";
 import HomeNavbar from "@/components/HomeNavbar.vue";
 
 export default {
   name: "HomeView",
   components: {
     HomeNavbar,
-    AddDocument,
   },
   setup() {},
 };
@@ -33,7 +30,7 @@ export default {
     #006684,
     #0c829a
   );
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   text-align: center;
 }
@@ -71,7 +68,7 @@ export default {
   white-space: nowrap;
   margin: 0 auto;
   letter-spacing: 0.15em;
-  animation: typing 3.5s steps(30, end), blink-caret 0.5s step-end infinite;
+  animation: typing 3.5s steps(50, end), blink-caret 0.5s step-end infinite;
 }
 
 @keyframes typing {

@@ -68,7 +68,7 @@ export default {
   white-space: nowrap;
   margin: 0 auto;
   letter-spacing: 0.15em;
-  animation: typing 3.5s steps(30, end), blink-caret 0.5s step-end infinite;
+  animation: typing 3.5s steps(50, end), blink-caret 0.5s step-end infinite;
 }
 
 @keyframes typing {

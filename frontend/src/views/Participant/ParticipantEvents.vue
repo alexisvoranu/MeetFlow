@@ -195,4 +195,11 @@ export default {
   width: 35%;
   margin-top: 2rem;
 }
+
+@media screen and (max-width: 1000px) {
+  .list-group {
+    width: 100%;
+    margin: 1rem;
+  }
+}
 </style>

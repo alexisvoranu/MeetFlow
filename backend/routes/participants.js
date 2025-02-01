@@ -1,6 +1,5 @@
 import express from "express";
 import * as participantsController from "../controllers/participants.js";
-import * as eventService from "../services/events.js";
 
 export const router = express.Router();
 

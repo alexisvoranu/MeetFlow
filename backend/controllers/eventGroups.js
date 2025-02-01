@@ -1,4 +1,6 @@
 import admin from "../firebase/firebase-admin.js";
+import { addDocument } from "../services/firestoreService.js";
+import { generateEvents } from "../services/firestoreService.js";
 
 export const getAllForOrganizer = async (req, res) => {
   const email = req.query.email;
@@ -113,6 +115,39 @@ export const addEventGroupForOrganizer = async (req, res) => {
   } catch (err) {
     console.error("Error adding event group by email:", err);
     res.status(500).json({ message: "Failed to add event group." });
+  }
+};
+
+export const generateData = async (req, res) => {
+  const count = 10;
+
+  try {
+    const { eventOrganizers, uniqueParticipants } = await generateEvents(count);
+
+    for (const organizer of eventOrganizers) {
+      const organizerId = await addDocument("organizers", organizer);
+
+      if (organizerId) {
+        console.log(`Organizers added with ID: ${organizerId}`);
+      }
+    }
+
+    for (const participant of uniqueParticipants) {
+      const participantId = await addDocument("participants", participant);
+
+      if (participantId) {
+        console.log(`Participant added with ID: ${participantId}`);
+      }
+    }
+
+    return res
+      .status(200)
+      .json({ message: "The data has been added to Firebase!" });
+  } catch (e) {
+    console.error("Error at generating and adding data: ", e);
+    return res
+      .status(500)
+      .json({ message: "Error at generating and adding data." });
   }
 };
 
