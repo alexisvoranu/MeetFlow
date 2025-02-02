@@ -24,7 +24,7 @@ export async function generateEvents(count) {
 
     for (let j = 0; j < numberOfGroups; j++) {
       const events = [];
-      const numberOfEvents = faker.number.int({ min: 3, max: 7 });
+      const numberOfEvents = faker.number.int({ min: 2, max: 6 });
 
       for (let k = 0; k < numberOfEvents; k++) {
         const participants = Array(faker.number.int({ min: 5, max: 30 }))
@@ -45,8 +45,26 @@ export async function generateEvents(count) {
           name: faker.company.name() + " Event",
           description: faker.lorem.sentence(),
           startDate: faker.date.future().toISOString(),
-          endDate: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString(),
-          status: faker.helpers.arrayElement(["Open", "Closed"]),
+          endDate: (function () {
+            let start = new Date(faker.date.future());
+            let end = new Date(start.getTime() + 1000 * 60 * 60 * 178);
+
+            if (end <= start) {
+              end = new Date(start.getTime() + 1000 * 600 * 60);
+            }
+
+            return end.toISOString();
+          })(),
+          status: (function () {
+            const currentDate = new Date();
+            const startDate = new Date(faker.date.future());
+
+            if (startDate < currentDate) {
+              return "Closed";
+            } else {
+              return faker.helpers.arrayElement(["Open", "Closed"]);
+            }
+          })(),
           participants,
         });
       }

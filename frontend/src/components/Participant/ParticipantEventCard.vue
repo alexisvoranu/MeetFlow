@@ -27,7 +27,7 @@
       <hr class="my-3" />
       <p class="my-2">{{ eventDetails?.eventDescription }}</p>
       <div class="mb-1">
-        <small>Opens at: {{ formatDate(eventDetails?.eventStartDate) }}</small>
+        <small>Starts at: {{ formatDate(eventDetails?.eventStartDate) }}</small>
         <br />
         <small>Closes at: {{ formatDate(eventDetails?.eventEndDate) }}</small>
         <hr class="my-3" />

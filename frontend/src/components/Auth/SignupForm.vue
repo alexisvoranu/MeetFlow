@@ -111,7 +111,17 @@ export default {
         router.push("/");
       } catch (error) {
         console.error("Error during registration:", error);
-        errMsg.value = error.message; 
+        switch (error.code) {
+          case "auth/weak-password":
+            errMsg.value = "The password should be at least 6 characters long!";
+            break;
+          case "auth/email-already-in-use":
+            errMsg.value = "An account with this email already exists!";
+            break;
+          default:
+            errMsg.value = "Error at sign up!";
+            break;
+        }
       }
     };
 
